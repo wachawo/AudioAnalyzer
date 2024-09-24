@@ -13,8 +13,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pygame
 
-
-OPTIONS = ["1", "2", "3", "4"]
+# Global options and log file name
+OPTIONS = ["YES", "NO", "SKIP"]  # You can add up to 10 options
 LOG_FILE = "aa.log"
 
 class AudioClassifierApp:
@@ -28,7 +28,7 @@ class AudioClassifierApp:
         self.log_file_path = None
         self.action_history = []
 
-        # Варианты перемещения файлов
+        # File moving options
         self.options = OPTIONS
 
         pygame.mixer.init()
@@ -87,22 +87,53 @@ class AudioClassifierApp:
         self.button_frame.pack(pady=10)
 
         self.buttons = []
-        for idx, option in enumerate(self.options, start=1):
+        # Map keys from '1' to '9' and '0' to options
+        key_mapping = ['1','2','3','4','5','6','7','8','9','0']
+        for idx, option in enumerate(self.options):
             btn = Button(self.button_frame, text=option, width=10,
                          command=lambda opt=option: self.move_file(opt),
                          activebackground='lightgray', activeforeground='black')
             btn.pack(side=LEFT, padx=5)
             self.buttons.append(btn)
-            self.root.bind(str(idx), lambda event, opt=option: self.move_file(opt))
+            # Bind hotkeys
+            if idx < len(key_mapping):
+                key = key_mapping[idx]
+                self.root.bind(f'<KeyPress-{key}>', lambda event, opt=option: self.move_file(opt))
+            else:
+                print(f"No key binding for option '{option}' (maximum 10 options supported).")
 
+        # Cancel button
         self.cancel_button = Button(self.button_frame, text="CANCEL", width=10, command=self.cancel_action,
                                     activebackground='lightgray', activeforeground='black', state=DISABLED)
         self.cancel_button.pack(side=LEFT, padx=5)
-        self.root.bind('4', lambda event: self.cancel_action())
+
+        # Bind keys for cancel action
+        self.bind_cancel_keys()
+
+        # Bind spacebar for replay
         self.root.bind('<space>', lambda event: self.play_audio())
 
         # Initially disable certain widgets
         self.disable_widgets()
+
+    def bind_cancel_keys(self):
+        # Bind to all key presses
+        self.root.bind('<Key>', self.on_keypress)
+
+    def on_keypress(self, event):
+        # Check for cancel keys
+        cancel_chars = ('c', 'C', 'с', 'С')  # Latin and Cyrillic 'C' and 'c'
+        if event.char in cancel_chars:
+            self.cancel_action()
+        elif event.keysym in ('BackSpace', 'Delete'):
+            self.cancel_action()
+        else:
+            # Check if key is associated with an option
+            key_mapping = ['1','2','3','4','5','6','7','8','9','0']
+            if event.keysym in key_mapping:
+                idx = key_mapping.index(event.keysym)
+                if idx < len(self.options):
+                    self.move_file(self.options[idx])
 
     def disable_widgets(self):
         self.reset_button.config(state=DISABLED)
@@ -308,12 +339,10 @@ class AudioClassifierApp:
     def on_waveform_click(self, event):
         self.play_audio()
 
-
 def main():
-    pass
-
-if __name__ == '__main__':
     root = Tk()
     app = AudioClassifierApp(root)
     root.mainloop()
 
+if __name__ == '__main__':
+    main()
