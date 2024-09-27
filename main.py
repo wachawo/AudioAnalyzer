@@ -3,9 +3,10 @@
 # brew install python-tk@3.11 tcl-tk ffmpeg
 # sudo apt install python3-tk tk-dev ffmpeg
 # pip3 install pillow pydub pygame matplotlib numpy
+
 import os
 import shutil
-from tkinter import *
+from tkinter import Tk, Frame, Button, Label, Canvas, LEFT, RIGHT, X, DISABLED, NORMAL
 from tkinter import filedialog
 from PIL import Image, ImageTk
 from pydub import AudioSegment
@@ -174,7 +175,7 @@ class AudioClassifierApp:
             self.log_file_path = os.path.join(self.selected_folder, LOG_FILE)
             if not os.path.exists(self.log_file_path):
                 with open(self.log_file_path, 'w') as f:
-                    pass  # Create empty log file
+                    f.write("")  # Create an empty log file
             self.action_history = []
 
     def reset_folder(self):
@@ -341,7 +342,7 @@ class AudioClassifierApp:
 
 def main():
     root = Tk()
-    app = AudioClassifierApp(root)
+    AudioClassifierApp(root)
     root.mainloop()
 
 if __name__ == '__main__':
