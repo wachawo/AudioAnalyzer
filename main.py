@@ -3,6 +3,7 @@
 # brew install python-tk@3.11 tcl-tk ffmpeg
 # sudo apt install python3-tk tk-dev ffmpeg
 # pip3 install pillow pydub pygame matplotlib numpy
+# sudo ln -sf ${PWD}/audioanalyzer /usr/local/bin/audioanalyzer
 import os
 import shutil
 from tkinter import *
@@ -13,8 +14,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pygame
 
-
-OPTIONS = ["1", "2", "3", "4"]
+OPTIONS = ["YES", "NO", "OTHER"]
 LOG_FILE = "aa.log"
 
 class AudioClassifierApp:

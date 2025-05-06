@@ -1,0 +1,11 @@
+#!/bin/bash
+set -ex
+cd $(dirname "$0")
+VENV_DIR="./venv"
+PYTHON_BIN="$VENV_DIR/bin/python3"
+if [ ! -d "$VENV_DIR" ]; then
+    python3 -m venv "$VENV_DIR"
+fi
+"$PYTHON_BIN" -m pip install --upgrade pip
+"$PYTHON_BIN" -m pip install -r requirements.txt
+"$PYTHON_BIN" ./main.py
