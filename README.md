@@ -3,7 +3,7 @@
 AudioAnalyzer is a simple Python GUI application for classifying and sorting a dataset of audio files (WAV, MP3) into folders using hotkeys and buttons.
 The program also displays the waveform of the audio file and allows quick undo of accidental actions.
 
-![image](https://github.com/user-attachments/assets/)
+![image](https://github.com/user-attachments/assets/62978992-db83-4799-9ac0-7c7dde8e5916)
 
 [Download](https://github.com/wachawo/audioanalyzer/releases)
 
@@ -44,7 +44,7 @@ python3 main.py
 * For proper audio playback on Linux, ALSA and ffmpeg may be required.
 * The app does not modify original files, only moves them into subfolders.
 
-### For Developers
+## For Developers
 
 ```bash
 pip install pre-commit flake8 pytest
