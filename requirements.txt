@@ -1,5 +1,8 @@
-pillow 
-pydub 
-pygame 
-matplotlib 
-numpy
+pillow==10.4.0
+pydub==0.25.1 
+pygame==2.6.1 
+matplotlib==3.7.5 
+numpy==1.24.4
+pytest==8.3.5
+pytest-mock==3.14.1
+pre-commit==4.2.0

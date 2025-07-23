@@ -1,0 +1,144 @@
+name: Build
+on:
+  # push:
+  #  tags:
+  #   - '0.1.*'
+  #  branches:
+  #   - main
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'version'
+        required: true
+        default: '0.1.0'
+permissions:
+  contents: write
+jobs:
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+    - name: Set up Python 3
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.12
+    - name: Install requirements.txt
+      run: |
+        set -eux
+        python3 -m pip install -r requirements.txt
+    - name: Build binary with PyInstaller
+      run: |
+        set -eux
+        python3 -m PyInstaller --onefile --windowed main.py --name lancalc
+    - name: Zip binary
+      run: |
+        set -eux
+        cd dist && zip -rm lancalc-linux.zip lancalc
+    - name: List artifacts
+      run: |
+        set -eux
+        tree
+    - name: Upload artifact for Linux
+      uses: actions/upload-artifact@v4
+      with:
+        name: lancalc-linux
+        path: dist/lancalc-linux.zip
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Set up Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.12
+      - name: Install requirements
+        run: |
+          python3 -m pip install -r requirements.txt
+      - name: Build binary with PyInstaller
+        run: |
+          set -eux
+          python3 -m PyInstaller --onefile --windowed main.py --name lancalc
+      - name: Zip binary
+        run: |
+          set -eux
+          cd dist && zip -rm lancalc-macos.zip lancalc
+      - name: List artifacts
+        run: |
+          set -eux
+          ls -lah dist
+      - name: Upload artifact for MacOS
+        uses: actions/upload-artifact@v4
+        with:
+          name: lancalc-macos
+          path: dist/lancalc-macos.zip
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Set up Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.12
+      - name: Install requirements
+        run: |
+          python -m pip install -r requirements.txt
+      - name: Build binary with PyInstaller
+        run: |
+          python -m PyInstaller --onefile --windowed main.py --name lancalc.exe
+      - name: Zip binary
+        shell: pwsh
+        run: |
+          cd dist
+          Compress-Archive -Path lancalc.exe -DestinationPath lancalc-windows.zip
+      - name: Upload artifact for Windows
+        uses: actions/upload-artifact@v4
+        with:
+          name: lancalc-windows
+          path: dist/lancalc-windows.zip
+
+  release:
+    needs: [build-linux, build-windows, build-macos]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Download Linux artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: lancalc-linux
+        path: dist
+    - name: Download MacOS artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: lancalc-macos
+        path: dist
+    - name: Download Windows artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: lancalc-windows
+        path: dist
+    - name: List artifacts
+      run: |
+        set -eux
+        tree
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        name: Release ${{ github.event.inputs.version }}
+        tag_name: ${{ github.event.inputs.version }}
+        body: 'Release ${{ github.event.inputs.version }}'
+        draft: true
+        prerelease: false
+        files: |
+          dist/lancalc-linux.zip
+          dist/lancalc-macos.zip
+          dist/lancalc-windows.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
